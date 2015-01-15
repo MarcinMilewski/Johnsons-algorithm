@@ -18,6 +18,11 @@ public class Graph {
     private int vertexCount;
     private int edgeCount;
 
+    private static final int INF = Integer.MAX_VALUE; // reprezentacja nieskonczonosci
+
+    // wyniki algorytmow
+    private TreeMap<Integer,Integer> distanceFordBellman;
+    private TreeMap<Integer, Integer> predecessorFordBellman;
 
     public Graph() {
         this.adjacencyList = new TreeMap<Integer, TreeMap<Integer, Integer>>();
@@ -29,6 +34,7 @@ public class Graph {
         TreeMap<Integer, Integer> oldRegistry = adjacencyList.get(from);
         oldRegistry.put(to,weight); // dodanie polaczenia - nowy wpis
         adjacencyList.replace(from, adjacencyList.get(from), oldRegistry);
+        edgeCount++;
     }
 
     public void removeEdge(Integer from, Integer to) {
@@ -36,6 +42,7 @@ public class Graph {
         TreeMap<Integer, Integer> oldRegistry = adjacencyList.get(from);
         oldRegistry.remove(to);
         adjacencyList.replace(from, adjacencyList.get(from), oldRegistry);
+        edgeCount--;
     }
 
     // dodaje odizolowany wierzcholek o indeksie v
@@ -61,5 +68,34 @@ public class Graph {
         else return true;
     }
 
+    public String toString() {
+        String string = new String();
 
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
+            for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) {
+                string += node.getKey() + " --> " + connectionList.getKey() + " waga: " + connectionList.getValue();
+            }
+        }
+        return string;
+    }
+
+    public void fordBellmanAlgorithm(Integer start) {
+        if (!adjacencyList.containsKey(start)) throw IllegalArgumentException(); // jesli brak wierzcholka start
+
+        distanceFordBellman = new TreeMap<Integer, Integer>();
+        predecessorFordBellman = new TreeMap<Integer, Integer>();
+
+        //ALGORYTM
+        // 1. Inicjalizacja grafu
+        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
+            if (node.getKey() == start) distanceFordBellman.put(start, 0); // zmiana wartosci - reput
+            else distanceFordBellman.put(node.getKey(), INF); // inicjalizuj mape dystansu
+            predecessorFordBellman.put(null, null);  // inicjalizuj mape poprzednikow
+        }
+
+        // 2. Relax edges repeatedly
+
+
+    }
 }
+
