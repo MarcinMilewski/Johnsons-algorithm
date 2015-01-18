@@ -17,14 +17,14 @@ public class Graph {
     private int vertexCount;
     private int edgeCount;
 
-    private static final int INF = Integer.MAX_VALUE; // reprezentacja nieskonczonosci
+    private static final int INF = Integer.MAX_VALUE / 2; // reprezentacja nieskonczonosci
 
     // wyniki algorytmow
-    private TreeMap<Integer,Integer> distanceFordBellman;
+    private TreeMap<Integer, Integer> distanceFordBellman;
     private TreeMap<Integer, Integer> predecessorFordBellman;
     private TreeMap<Integer, Integer> distanceDijkstra;
     private TreeMap<Integer, Integer> predecessorDijkstra;
-    private int[][] distanceJohnson; // macierz wag najkrotszych sciezek
+    private TreeMap<Integer, TreeMap<Integer, Integer>> distanceJohnson; // macierz wag najkrotszych sciezek
 
     public Graph() {
         this.adjacencyList = new TreeMap<Integer, TreeMap<Integer, Integer>>();
@@ -32,15 +32,17 @@ public class Graph {
 
     // dodaje krawedz do grafu
     public void addEdge(Integer from, Integer to, Integer weight) {
-        if (!(adjacencyList.containsKey(from) && adjacencyList.containsKey(to))) throw new IllegalArgumentException(); // jesli brak wierzcholka from i to w grafie - wyjatek
+        if (!(adjacencyList.containsKey(from) && adjacencyList.containsKey(to)))
+            throw new IllegalArgumentException(); // jesli brak wierzcholka from i to w grafie - wyjatek
         TreeMap<Integer, Integer> oldRegistry = adjacencyList.get(from);
-        oldRegistry.put(to,weight); // dodanie polaczenia - nowy wpis
+        oldRegistry.put(to, weight); // dodanie polaczenia - nowy wpis
         adjacencyList.replace(from, adjacencyList.get(from), oldRegistry);
         edgeCount++;
     }
 
     public void removeEdge(Integer from, Integer to) {
-        if (!(adjacencyList.containsKey(from) && adjacencyList.containsKey(to))) throw new IllegalArgumentException(); // jesli brak wierzcholkow - wyrzuc wyjatek
+        if (!(adjacencyList.containsKey(from) && adjacencyList.containsKey(to)))
+            throw new IllegalArgumentException(); // jesli brak wierzcholkow - wyrzuc wyjatek
         TreeMap<Integer, Integer> oldRegistry = adjacencyList.get(from);
         oldRegistry.remove(to);
         adjacencyList.replace(from, adjacencyList.get(from), oldRegistry);
@@ -66,7 +68,7 @@ public class Graph {
         if (!adjacencyList.containsKey(from)) return false; // brak w. from w grafie - brak krawedzi
         TreeMap<Integer, Integer> vertexList = adjacencyList.get(from);
 
-        if(!vertexList.containsKey(to)) return false;
+        if (!vertexList.containsKey(to)) return false;
         else return true;
     }
 
@@ -89,20 +91,20 @@ public class Graph {
 
         //ALGORYTM
         // 1. Inicjalizacja grafu
-        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
-            if (node.getKey() == start) distanceFordBellman.put(start, 0); // zmiana wartosci - reput
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
+            if (node.getKey().equals(start)) distanceFordBellman.put(start, 0); // zmiana wartosci - reput
             else distanceFordBellman.put(node.getKey(), INF); // inicjalizuj mape dystansu
             predecessorFordBellman.put(node.getKey(), null);  // inicjalizuj mape poprzednikow
         }
 
         // 2. Relax edges repeatedly
-        for (int i = 1; i <= vertexCount -1; i++) {
-            for (Map.Entry<Integer,TreeMap<Integer,Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
+        for (int i = 1; i <= vertexCount - 1; i++) {
+            for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
                 for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla kazdej krawedzi od niego odchodzacej.
                     if (distanceFordBellman.get(node.getKey()) + connectionList.getValue() < distanceFordBellman.get(connectionList.getKey())) {  // if distance[u] + w < distance[v]:
                         int newDistance = distanceFordBellman.get(node.getKey()) + connectionList.getValue();
                         distanceFordBellman.put(connectionList.getKey(), newDistance); // distance[v] := distance[u] + w
-                        predecessorFordBellman.put(connectionList.getKey(),node.getKey()); // predecessor[v] := u
+                        predecessorFordBellman.put(connectionList.getKey(), node.getKey()); // predecessor[v] := u
                     }
                 }
 
@@ -114,6 +116,7 @@ public class Graph {
 //        error "Graph contains a negative-weight cycle"
 //        return distance[], predecessor[]
     }
+
     public int getFordBellmanDistanceTo(int node) {
         if (!adjacencyList.containsKey(node)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
         return distanceFordBellman.get(node);
@@ -123,7 +126,7 @@ public class Graph {
     public String fordBellmanDistanceToString() {
         String toReturn = new String();
         for (Map.Entry<Integer, Integer> distance : distanceFordBellman.entrySet()) {
-            toReturn+= "from start to " + distance.getKey() + "distance: " + distance.getValue() + " ,predecessor :" + predecessorFordBellman.get(distance.getKey());
+            toReturn += "from start to " + distance.getKey() + " distance: " + distance.getValue() + " ,predecessor :" + predecessorFordBellman.get(distance.getKey()) + "\n";
         }
         return toReturn;
     }
@@ -135,12 +138,12 @@ public class Graph {
         distanceDijkstra = new TreeMap<Integer, Integer>();
         predecessorDijkstra = new TreeMap<Integer, Integer>();
 
-        TreeMap<Integer,TreeMap<Integer,Integer>> copyAdjacencyList = adjacencyList;
+        TreeMap<Integer, TreeMap<Integer, Integer>> copyAdjacencyList = adjacencyList;
 
         TreeSet<Integer> set = new TreeSet<Integer>();
         //ALGORYTM
         // 1. Inicjalizacja grafu
-        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
             if (node.getKey() == start) distanceDijkstra.put(start, 0); // zmiana wartosci - reput
             else distanceDijkstra.put(node.getKey(), INF); // inicjalizuj mape dystansu
             predecessorDijkstra.put(node.getKey(), null);  // inicjalizuj mape poprzednikow
@@ -148,31 +151,31 @@ public class Graph {
             // dodawaj do tablicy
             set.add(node.getKey());
         }
-            // while array is not empty:
-            while(set.size() > 0) {
-                int min = Integer.MAX_VALUE;
-                int vertex = 0;
-                for (Map.Entry<Integer,Integer> distance :distanceDijkstra.entrySet()) {
-                    if (distance.getValue() < min && set.contains(distance.getKey())) {
-                        min = distance.getValue();
-                        vertex = distance.getKey();
-                    }
+        // while array is not empty:
+        while (set.size() > 0) {
+            int min = Integer.MAX_VALUE;
+            int vertex = 0;
+            for (Map.Entry<Integer, Integer> distance : distanceDijkstra.entrySet()) {
+                if (distance.getValue() < min && set.contains(distance.getKey())) {
+                    min = distance.getValue();
+                    vertex = distance.getKey();
                 }
-                // remove vertex from array
-                set.remove(vertex);
+            }
+            // remove vertex from array
+            set.remove(vertex);
 
-                TreeMap<Integer, Integer> list = adjacencyList.get(vertex);
+            TreeMap<Integer, Integer> list = adjacencyList.get(vertex);
 
-                //for each neighbor v of vertex: v - entry.getKey(), u - vertex, w(u,v) - entry.getValue()
-                for (Map.Entry<Integer, Integer> entry : list.entrySet()) {
+            //for each neighbor v of vertex: v - entry.getKey(), u - vertex, w(u,v) - entry.getValue()
+            for (Map.Entry<Integer, Integer> entry : list.entrySet()) {
                 int alt = distanceDijkstra.get(vertex) + entry.getValue();
-                    if (alt < distanceDijkstra.get(entry.getKey())) {
-                        distanceDijkstra.put(entry.getKey(), alt);
-                        predecessorDijkstra.put(entry.getKey(), vertex);
-                    }
+                if (alt < distanceDijkstra.get(entry.getKey())) {
+                    distanceDijkstra.put(entry.getKey(), alt);
+                    predecessorDijkstra.put(entry.getKey(), vertex);
                 }
             }
         }
+    }
 
     public int getDijkstraDistanceTo(int node) {
         if (!adjacencyList.containsKey(node)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
@@ -182,28 +185,22 @@ public class Graph {
     public String dijkstraDistanceToString() {
         String toReturn = new String();
         for (Map.Entry<Integer, Integer> distance : distanceDijkstra.entrySet()) {
-            toReturn+= "from start to " + distance.getKey() + "distance: " + distance.getValue() + " ,predecessor :" + predecessorDijkstra.get(distance.getKey());
+            toReturn += " from start to " + distance.getKey() + " distance: " + distance.getValue() + " ,predecessor :" + predecessorDijkstra.get(distance.getKey()) + "\n";
         }
         return toReturn;
     }
 
     public void johnsonAlgorithm() {
 
-        // 0. inicjalzuj macierz
-        distanceJohnson = new int[adjacencyList.size()][adjacencyList.size()];
-        for (int i = 0; i < distanceJohnson.length; i++) {
-            for (int j = 0; j < distanceJohnson.length; j++) {
-                distanceJohnson[i][j] = Integer.MAX_VALUE;
-            }
-        }
-
+        //init
+        distanceJohnson = new TreeMap<Integer, TreeMap<Integer, Integer>>();
         //1. Dodaj nowy węzeł q połączony krawędziami o wagach 0 z każdym innym wierzchołkiem grafu
         int q = Integer.MAX_VALUE;
         TreeMap<Integer, Integer> temp = new TreeMap<Integer, Integer>();
-        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node: adjacencyList.entrySet()) { // dla kazdego wierzcholka - dodaj go do mapy temp
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka - dodaj go do mapy temp
             temp.put(node.getKey(), 0);
         }
-        copyAdjacencyList.put(q, temp);
+        adjacencyList.put(q, temp);
 
         //2. Użyj algorytmu Bellmana-Forda startując od dodanego wierzchołka q, aby odnaleźć minimalną odległość
         // d[v] każdego wierzchołka v od q. Jeżeli został wykryty ujemny cykl, zwróć tę informację i przerwij działanie algorytmu
@@ -213,30 +210,40 @@ public class Graph {
         // nie zmieniając wartości najkrótszych ścieżek. W tym celu każdej krawędzi (u,v) o
         // wadze w(u,v) przypisz nową wagę w(u,v) + d[u] - d[v]
 
-        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node: copyAdjacencyList.entrySet()) { // dla kazdego wierzcholka
-            TreeMap<Integer,Integer> newConnectionList = new TreeMap<Integer, Integer>();
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
+            TreeMap<Integer, Integer> newConnectionList = new TreeMap<Integer, Integer>();
             for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
                 int newWeight = connectionList.getValue() + distanceFordBellman.get(node.getKey()) - distanceFordBellman.get(connectionList.getKey());
                 newConnectionList.put(connectionList.getKey(), newWeight);
             }
-            copyAdjacencyList.put(node.getKey(), newConnectionList);
+            adjacencyList.put(node.getKey(), newConnectionList);
         }
 
         //4. Usuń początkowo dodany węzeł q
-        copyAdjacencyList.remove(q);
+        adjacencyList.remove(q);
 
         //5. Użyj algorytmu Dijkstry dla każdego wierzchołka w grafie
-        int row = 0;
-        for (Map.Entry<Integer, TreeMap<Integer, Integer>>node : adjacencyList.entrySet()) {// dla kazdego wierzcholka
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) {// dla kazdego wierzcholka
             dijkstraAlgorithm(node.getKey());
 
-            // wypeln odpowiednio tablice
-            for (Map.Entry<Integer,TreeMap<Integer,Integer>> i : adjacencyList.entrySet()) {
-                distanceJohnson[row][i.getKey() - 1] = distanceDijkstra.get(i.getKey());
-                row++;
-            }
+            // wypelniaj macierz wynikowa
+            //assert(distanceDijkstra.size() > 0);
+            distanceJohnson.put(node.getKey(), distanceDijkstra);
         }
     }
+
+    public String johnsonDistanceToString() {
+        String toReturn = new String();
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
+            toReturn += "From " + node.getKey() + ":\n";
+            for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
+                toReturn += " to " + connectionList.getKey() + " ,distance: " + connectionList.getValue() + "\n";
+            }
+        }
+        return toReturn;
+    }
 }
+
+
 
 
