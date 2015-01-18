@@ -1,7 +1,6 @@
 package com.company;
 
 import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
-import com.sun.java.util.jar.pack.ConstantPool;
 import sun.reflect.generics.tree.*;
 
 import java.util.*;
@@ -110,24 +109,20 @@ public class Graph {
         }
         // 3. Check for negative-weight cycle
     }
-    public int getDistanceTo(int node) {
+    public int getFordBellmanDistanceTo(int node) {
         if (!adjacencyList.containsKey(node)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
         return distanceFordBellman.get(node);
     }
-}
+
 
     public String fordBellmanDistanceToString() {
-        String toReturn = new String;
+        String toReturn = new String();
         for (Map.Entry<Integer, Integer> distance : distanceFordBellman.entrySet()) {
             toReturn+= "from start to " + distance.getKey() + "distance: " + distance.getValue() + " ,predecessor :" + predecessorFordBellman.get(distance.getKey());
         }
+        return toReturn;
     }
 
-    // znajduje klucz dla ktorego dystnas jest najmniejszy
-    private int getMinKeyDijkstraDistanceAndArray() {
-
-        return node;
-    }
 
     public void dijkstraAlgorithm(Integer start) {
         if (!adjacencyList.containsKey(start)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
@@ -146,8 +141,8 @@ public class Graph {
             predecessorDijkstra.put(node.getKey(), null);  // inicjalizuj mape poprzednikow
 
             // dodawaj do tablicy
-            array.add(node.getKey());
-
+            set.add(node.getKey());
+        }
             // while array is not empty:
             while(set.size() > 0) {
                 int min = Integer.MAX_VALUE;
@@ -163,16 +158,33 @@ public class Graph {
 
                 TreeMap<Integer, Integer> list = adjacencyList.get(vertex);
 
-                //for each neighbor v of vertex:
+                //for each neighbor v of vertex: v - entry.getKey(), u - vertex, w(u,v) - entry.getValue()
                 for (Map.Entry<Integer, Integer> entry : list.entrySet()) {
-                int alt = distanceDijkstra.get(entry.getKey()) + entry.getValue();
-                    if (alt < )
+                int alt = distanceDijkstra.get(vertex) + entry.getValue();
+                    if (alt < distanceDijkstra.get(entry.getKey())) {
+                        distanceDijkstra.put(entry.getKey(), alt);
+                        predecessorDijkstra.put(entry.getKey(), vertex);
+                    }
                 }
             }
         }
 
+    public int getDijkstraDistanceTo(int node) {
+        if (!adjacencyList.containsKey(node)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
+        return distanceDijkstra.get(node);
+    }
 
+    public String dijkstraDistanceToString() {
+        String toReturn = new String();
+        for (Map.Entry<Integer, Integer> distance : distanceDijkstra.entrySet()) {
+            toReturn+= "from start to " + distance.getKey() + "distance: " + distance.getValue() + " ,predecessor :" + predecessorDijkstra.get(distance.getKey());
+        }
+        return toReturn;
+    }
+
+    public void johnsonAlgorithm() {
 
     }
+}
 
 
