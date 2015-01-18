@@ -1,11 +1,10 @@
 package com.company;
 
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry;
+import com.sun.java.util.jar.pack.ConstantPool;
 import sun.reflect.generics.tree.*;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public class Graph {
@@ -124,31 +123,56 @@ public class Graph {
         }
     }
 
+    // znajduje klucz dla ktorego dystnas jest najmniejszy
+    private int getMinKeyDijkstraDistanceAndArray() {
+
+        return node;
+    }
+
     public void dijkstraAlgorithm(Integer start) {
         if (!adjacencyList.containsKey(start)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
 
         distanceDijkstra = new TreeMap<Integer, Integer>();
         predecessorDijkstra = new TreeMap<Integer, Integer>();
 
-        Queue<Integer> queue;
+        TreeMap<Integer,TreeMap<Integer,Integer>> copyAdjacencyList = adjacencyList;
+
+        TreeSet<Integer> set = new TreeSet<Integer>();
         //ALGORYTM
         // 1. Inicjalizacja grafu
         for (Map.Entry<Integer, TreeMap<Integer,Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
-            if (node.getKey() == start) distanceFordBellman.put(start, 0); // zmiana wartosci - reput
-            else distanceFordBellman.put(node.getKey(), INF); // inicjalizuj mape dystansu
-            predecessorFordBellman.put(node.getKey(), null);  // inicjalizuj mape poprzednikow
+            if (node.getKey() == start) distanceDijkstra.put(start, 0); // zmiana wartosci - reput
+            else distanceDijkstra.put(node.getKey(), INF); // inicjalizuj mape dystansu
+            predecessorDijkstra.put(node.getKey(), null);  // inicjalizuj mape poprzednikow
 
-            // dodawaj do kolejki
-            queue.add(node.getKey());
+            // dodawaj do tablicy
+            array.add(node.getKey());
+
+            // while array is not empty:
+            while(set.size() > 0) {
+                int min = Integer.MAX_VALUE;
+                int vertex = 0;
+                for (Map.Entry<Integer,Integer> distance :distanceDijkstra.entrySet()) {
+                    if (distance.getValue() < min && set.contains(distance.getKey())) {
+                        min = distance.getValue();
+                        vertex = distance.getKey();
+                    }
+                }
+                // remove vertex from array
+                set.remove(vertex);
+
+                TreeMap<Integer, Integer> list = adjacencyList.get(vertex);
+
+                //for each neighbor v of vertex:
+                for (Map.Entry<Integer, Integer> entry : list.entrySet()) {
+                int alt = distanceDijkstra.get(entry.getKey()) + entry.getValue();
+                    if (alt < )
+                }
+            }
         }
 
-        TreeMap<Integer,TreeMap<Integer,Integer>> copyAdjacencyList = adjacencyList.eq;
 
-        while (queue.size() > 0) { // while Q is not empty:
-            // u ← vertex in Q with min dist[u] - najpierw w. startowy
-
-            // remove u from Q
-        }
 
     }
+
 
