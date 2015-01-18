@@ -110,11 +110,14 @@ public class Graph {
 
             }
         }
-        // 3. Check for negative-weight cycle
-//        for each edge (u, v) with weight w in edges:
-//        if distance[u] + w < distance[v]:
-//        error "Graph contains a negative-weight cycle"
-//        return distance[], predecessor[]
+        // 3. Check for negative-weight cycle, node.getKey() = u , connectionList.getKey() = v
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
+            for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla kazdej krawedzi od niego odchodzacej.
+                if (distanceFordBellman.get(node.getKey()) + connectionList.getValue() < distanceFordBellman.get(connectionList.getKey())) {
+                    System.out.println("Graf zawiera ujemny cykl");
+                }
+            }
+        }
     }
 
     public int getFordBellmanDistanceTo(int node) {
