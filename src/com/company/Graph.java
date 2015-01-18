@@ -24,6 +24,7 @@ public class Graph {
     private TreeMap<Integer, Integer> predecessorFordBellman;
     private TreeMap<Integer, Integer> distanceDijkstra;
     private TreeMap<Integer, Integer> predecessorDijkstra;
+    private int[][] distanceJohnson; // macierz wag najkrotszych sciezek
 
     public Graph() {
         this.adjacencyList = new TreeMap<Integer, TreeMap<Integer, Integer>>();
@@ -108,6 +109,10 @@ public class Graph {
             }
         }
         // 3. Check for negative-weight cycle
+//        for each edge (u, v) with weight w in edges:
+//        if distance[u] + w < distance[v]:
+//        error "Graph contains a negative-weight cycle"
+//        return distance[], predecessor[]
     }
     public int getFordBellmanDistanceTo(int node) {
         if (!adjacencyList.containsKey(node)) throw new IllegalArgumentException(); // jesli brak wierzcholka start
@@ -184,6 +189,53 @@ public class Graph {
 
     public void johnsonAlgorithm() {
 
+        // 0. inicjalzuj macierz
+        distanceJohnson = new int[adjacencyList.size()][adjacencyList.size()];
+        for (int i = 0; i < distanceJohnson.length; i++) {
+            for (int j = 0; j < distanceJohnson.length; j++) {
+                distanceJohnson[i][j] = Integer.MAX_VALUE;
+            }
+        }
+
+        //1. Dodaj nowy węzeł q połączony krawędziami o wagach 0 z każdym innym wierzchołkiem grafu
+        int q = Integer.MAX_VALUE;
+        TreeMap<Integer, Integer> temp = new TreeMap<Integer, Integer>();
+        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node: adjacencyList.entrySet()) { // dla kazdego wierzcholka - dodaj go do mapy temp
+            temp.put(node.getKey(), 0);
+        }
+        copyAdjacencyList.put(q, temp);
+
+        //2. Użyj algorytmu Bellmana-Forda startując od dodanego wierzchołka q, aby odnaleźć minimalną odległość
+        // d[v] każdego wierzchołka v od q. Jeżeli został wykryty ujemny cykl, zwróć tę informację i przerwij działanie algorytmu
+        fordBellmanAlgorithm(q);
+
+        //3. W tym kroku przewagujemy graf tak, aby zlikwidować ujemne wagi krawędzi
+        // nie zmieniając wartości najkrótszych ścieżek. W tym celu każdej krawędzi (u,v) o
+        // wadze w(u,v) przypisz nową wagę w(u,v) + d[u] - d[v]
+
+        for (Map.Entry<Integer, TreeMap<Integer,Integer>> node: copyAdjacencyList.entrySet()) { // dla kazdego wierzcholka
+            TreeMap<Integer,Integer> newConnectionList = new TreeMap<Integer, Integer>();
+            for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
+                int newWeight = connectionList.getValue() + distanceFordBellman.get(node.getKey()) - distanceFordBellman.get(connectionList.getKey());
+                newConnectionList.put(connectionList.getKey(), newWeight);
+            }
+            copyAdjacencyList.put(node.getKey(), newConnectionList);
+        }
+
+        //4. Usuń początkowo dodany węzeł q
+        copyAdjacencyList.remove(q);
+
+        //5. Użyj algorytmu Dijkstry dla każdego wierzchołka w grafie
+        int row = 0;
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>>node : adjacencyList.entrySet()) {// dla kazdego wierzcholka
+            dijkstraAlgorithm(node.getKey());
+
+            // wypeln odpowiednio tablice
+            for (Map.Entry<Integer,TreeMap<Integer,Integer>> i : adjacencyList.entrySet()) {
+                distanceJohnson[row][i.getKey() - 1] = distanceDijkstra.get(i.getKey());
+                row++;
+            }
+        }
     }
 }
 
