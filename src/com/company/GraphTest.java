@@ -164,22 +164,17 @@ public class GraphTest extends TestCase {
         assertTrue("Czy zawiera krawedz 1 - 2", g.containsEdge(1, 2));
 
         // dodaj krawedz 1 -3
-        g.addEdge(1, 3, 10);
+        g.addEdge(1, 3, 8);
         assertTrue("Czy zawiera krawedz 1 - 3", g.containsEdge(1, 2));
 
         // dodaj krawedz 2-3
-        g.addEdge(2, 3, 2);
+        g.addEdge(2, 3, 0);
 
 //        System.out.println("Graf: ");
 //        System.out.println(g.toString());
         // algorytm
         g.dijkstraAlgorithm(1);
 
-        // dystans 1-2 to 5
-        assertTrue("Dystans 1-2 to 5", 5 == g.getDijkstraDistanceTo(2));
-
-        // dystans 1-3 to 7
-        assertTrue("Dystans 2-3 to 7", 7 == g.getDijkstraDistanceTo(3));
 
         System.out.println("Dijkstra Map: ");
         System.out.println(g.dijkstraDistanceToString());
@@ -208,20 +203,14 @@ public class GraphTest extends TestCase {
         assertTrue("Czy zawiera krawedz 1 - 2", g.containsEdge(1, 2));
 
         // dodaj krawedz 1 -3
-        g.addEdge(1, 3, 10);
+        g.addEdge(1, 3, 2);
         assertTrue("Czy zawiera krawedz 1 - 3", g.containsEdge(1, 2));
 
         // dodaj krawedz 2-3
-        g.addEdge(2, 3, 2);
+        g.addEdge(2, 3, -6);
 
-        // dodaj wierzch
-        int q = Integer.MAX_VALUE;
-        g.addVertex(q);
 
-        g.addEdge(q,1, 0);
-        g.addEdge(q,2, 0);
-        g.addEdge(q,3, 0);
-        g.fordBellmanAlgorithm(q);
+        g.fordBellmanAlgorithm(1);
 
 
         System.out.println("Graf: ");
@@ -252,11 +241,11 @@ public class GraphTest extends TestCase {
         assertTrue("Czy zawiera krawedz 1 - 2", g.containsEdge(1, 2));
 
         // dodaj krawedz 1 -3
-        g.addEdge(1, 3, 10);
+        g.addEdge(1, 3, 2);
         assertTrue("Czy zawiera krawedz 1 - 3", g.containsEdge(1, 2));
 
         // dodaj krawedz 2-3
-        g.addEdge(2, 3, 2);
+        g.addEdge(2, 3, -6);
 
         // algorytm
         g.johnsonAlgorithm();

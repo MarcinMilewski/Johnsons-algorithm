@@ -25,6 +25,7 @@ public class Graph {
     private TreeMap<Integer, Integer> distanceDijkstra;
     private TreeMap<Integer, Integer> predecessorDijkstra;
     private TreeMap<Integer, TreeMap<Integer, Integer>> distanceJohnson; // macierz wag najkrotszych sciezek
+    private TreeMap<Integer, Integer> d;
 
     public Graph() {
         this.adjacencyList = new TreeMap<Integer, TreeMap<Integer, Integer>>();
@@ -212,14 +213,14 @@ public class Graph {
         // wadze w(u,v) przypisz nową wagę w(u,v) + d[u] - d[v]
 
         for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
-            TreeMap<Integer, Integer> newConnectionList = new TreeMap<Integer, Integer>();
             for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
-                int newWeight = connectionList.getValue() + distanceFordBellman.get(node.getKey()) - distanceFordBellman.get(connectionList.getKey());
-                newConnectionList.put(connectionList.getKey(), newWeight);
+                int staraWage = connectionList.getValue();
+               int uDystans = distanceFordBellman.get(node.getKey());
+                int vDystans = distanceFordBellman.get(connectionList.getKey());
+               int newWeight = connectionList.getValue() + distanceFordBellman.get(node.getKey()) - distanceFordBellman.get(connectionList.getKey());
+            connectionList.setValue(connectionList.getValue() + distanceFordBellman.get(node.getKey()) - distanceFordBellman.get(connectionList.getKey()));
             }
-            adjacencyList.put(node.getKey(), newConnectionList);
         }
-
         //4. Usuń początkowo dodany węzeł q
         adjacencyList.remove(q);
 
@@ -228,8 +229,12 @@ public class Graph {
             dijkstraAlgorithm(node.getKey());
 
             // wypelniaj macierz wynikowa
-            TreeMap<Integer, Integer> dd = new TreeMap<Integer, Integer>(distanceDijkstra);
-            distanceJohnson.put(node.getKey(),dd);
+            d = new TreeMap<Integer, Integer>();
+            for (Map.Entry<Integer, TreeMap<Integer, Integer>> i : adjacencyList.entrySet()) {
+                d.put(i.getKey(), distanceDijkstra.get(i.getKey()) - distanceFordBellman.get(node.getKey()) + distanceFordBellman.get(i.getKey()));
+            }
+
+            distanceJohnson.put(node.getKey(), d);
         }
     }
 
