@@ -227,17 +227,23 @@ public class Graph {
             dijkstraAlgorithm(node.getKey());
 
             // wypelniaj macierz wynikowa
-            //assert(distanceDijkstra.size() > 0);
-            distanceJohnson.put(node.getKey(), distanceDijkstra);
+            TreeMap<Integer, Integer> dd = new TreeMap<Integer, Integer>(distanceDijkstra);
+            distanceJohnson.put(node.getKey(),dd);
         }
     }
 
     public String johnsonDistanceToString() {
         String toReturn = new String();
-        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka
+        for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : distanceJohnson.entrySet()) { // dla kazdego wierzcholka
             toReturn += "From " + node.getKey() + ":\n";
             for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
-                toReturn += " to " + connectionList.getKey() + " ,distance: " + connectionList.getValue() + "\n";
+                toReturn += " to " + connectionList.getKey() + " ,distance: ";
+                if (connectionList.getValue().equals(INF) ) {
+                    toReturn += " INF" + "\n";
+                }
+                else {
+                    toReturn += connectionList.getValue() + "\n";
+                }
             }
         }
         return toReturn;
