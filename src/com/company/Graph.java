@@ -56,8 +56,6 @@ public class Graph {
         vertexCount++;
     }
 
-    // TODO usuwanie wierzcholka
-
     // sprawdza czy graf zawiera dany wierzcholek
     public boolean containsVertex(Integer v) {
         return adjacencyList.containsKey(v);
@@ -77,7 +75,7 @@ public class Graph {
 
         for (Map.Entry<Integer, TreeMap<Integer, Integer>> node : adjacencyList.entrySet()) { // dla kazdego wierzcholka w grafie
             for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) {
-                string += node.getKey() + " --> " + connectionList.getKey() + " waga: " + connectionList.getValue();
+                string += node.getKey() + " --> " + connectionList.getKey() + " waga: " + connectionList.getValue() +"\n";
             }
         }
         return string;
