@@ -256,13 +256,12 @@ public class Graph {
                 // dopoki start != end
                 string += end + ", ";
                 while (start != end) {
-                    string += predecessorDijkstra.get(end) + ", ";
+                    string += predecessorDijkstra.get(end) + " ,";
                     end = predecessorDijkstra.get(end); // koncem staje sie wierzcholek poprzedzajacy koniec
                 }
 
                 string = string.substring(0, string.length() -2); // usun przecinek
-                string += "\n";
-                //string = string.inve
+                string = new StringBuffer(string).reverse().toString(); // reverse
                 // wrzuc do kontenera
                 TreeMap<Integer, String> toPut =  new TreeMap<Integer, String>();
                 toPut.put(tmp,string);
@@ -297,7 +296,7 @@ public class Graph {
         String tempString = new String();
         for (Map.Entry<Integer, TreeMap<Integer, String>> entry : shortestPathToPrint) {
             if (entry.getKey() == start && entry.getValue().containsKey(end)) {
-                toReturn += start + " -> " + end + " Path: " + entry.getValue().get(end);
+                toReturn += start + " -> " + end + " Path: " + entry.getValue().get(end) + "\n";
             }
         }
         return toReturn;

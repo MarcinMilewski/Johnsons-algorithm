@@ -10,7 +10,8 @@ public class Main {
         READ_NODES,
         READ_EDGES,
         RUNNING,
-        WRITE,
+        RECONSTRUCT_PATHS,
+        END
     }
 
     public static void main(String[] args) {
@@ -65,6 +66,7 @@ public class Main {
          // algorytm Johnsona
         try {
             if (status == Status.RUNNING) graph.johnsonAlgorithm();
+            status = Status.RECONSTRUCT_PATHS;
         }
         catch (Exception e) {
             System.out.println("Wystapil blad");
@@ -81,6 +83,24 @@ public class Main {
         }
         catch(FileNotFoundException e) {
             System.out.println(e.getStackTrace());
+        }
+
+        // odtwarzaj sciezki
+        System.out.println("Odtwarzanie sciezki: (Wpisz x aby zakonczyc) ");
+        while (status == Status.RECONSTRUCT_PATHS) {
+            Integer start;
+            Integer end;
+            try {
+                System.out.println("Wprowadz poczatek sciezki: ");
+                start = Integer.parseInt(scanner.nextLine());
+                System.out.println("Wprowadz koniec sciezki: ");
+                end = Integer.parseInt(scanner.nextLine());
+                System.out.print(graph.reconstructShortestPath(start, end));
+            }
+            catch (NumberFormatException nfe) {
+                System.out.println("Zakonczyles odtwarzanie sciezki.");
+                status = Status.END;
+            }
         }
     }
 
