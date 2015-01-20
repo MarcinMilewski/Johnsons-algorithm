@@ -26,7 +26,7 @@ public class Graph {
     private TreeMap<Integer, Integer> predecessorDijkstra;
     private TreeMap<Integer, TreeMap<Integer, Integer>> distanceJohnson; // macierz wag najkrotszych sciezek
     private TreeMap<Integer, Integer> d;
-
+    List<Map.Entry<Integer, TreeMap<Integer, String>>> shortestPathToPrint = new ArrayList<Map.Entry<Integer, TreeMap<Integer, String>>>();
     public Graph() {
         this.adjacencyList = new TreeMap<Integer, TreeMap<Integer, Integer>>();
     }
@@ -196,6 +196,7 @@ public class Graph {
 
         //init
         distanceJohnson = new TreeMap<Integer, TreeMap<Integer, Integer>>();
+        shortestPathToPrint = new ArrayList<Map.Entry<Integer, TreeMap<Integer, String>>>(); // najkrotsze sciezki do wydruku
         //1. Dodaj nowy węzeł q połączony krawędziami o wagach 0 z każdym innym wierzchołkiem grafu
         int q = Integer.MAX_VALUE;
         TreeMap<Integer, Integer> temp = new TreeMap<Integer, Integer>();
@@ -235,6 +236,38 @@ public class Graph {
             }
 
             distanceJohnson.put(node.getKey(), d);
+
+            // odtwarzanie sciezek
+            Integer start = node.getKey();
+            // dla kazdego z listy distanceDijkstra aktualnego wierzcholka
+            for (Integer NodeFromDistanceList : distanceDijkstra.keySet()) {
+                Integer end = NodeFromDistanceList;
+                Integer tmp = end;
+                String string = new String();
+
+                // jesli distance od node do end = INF, wpisz noPath - brak sciezki od start do end
+                if (distanceDijkstra.get(end) == INF) {
+                    TreeMap<Integer, String> toPut =  new TreeMap<Integer, String>();
+                    toPut.put(end,"No Path");
+                    shortestPathToPrint.add(new AbstractMap.SimpleEntry<Integer,TreeMap<Integer, String>>(node.getKey(), toPut));
+                    continue; // next
+                }
+
+                // dopoki start != end
+                string += end + ", ";
+                while (start != end) {
+                    string += predecessorDijkstra.get(end) + ", ";
+                    end = predecessorDijkstra.get(end); // koncem staje sie wierzcholek poprzedzajacy koniec
+                }
+
+                string = string.substring(0, string.length() -2); // usun przecinek
+                string += "\n";
+                //string = string.inve
+                // wrzuc do kontenera
+                TreeMap<Integer, String> toPut =  new TreeMap<Integer, String>();
+                toPut.put(tmp,string);
+                shortestPathToPrint.add(new AbstractMap.SimpleEntry<Integer, TreeMap<Integer, String>>(node.getKey(), toPut));
+            }
         }
     }
 
@@ -244,7 +277,7 @@ public class Graph {
             toReturn += "From " + node.getKey() + ":\n";
             for (Map.Entry<Integer, Integer> connectionList : node.getValue().entrySet()) { // dla listy
                 toReturn += " to " + connectionList.getKey() + " ,distance: ";
-                if (connectionList.getValue().equals(INF) ) {
+                if (connectionList.getValue() > (INF/10)) {
                     toReturn += " INF" + "\n";
                 }
                 else {
@@ -254,7 +287,23 @@ public class Graph {
         }
         return toReturn;
     }
+
+    public String reconstructShortestPath (Integer start, Integer end) {
+        String toReturn = new String();
+        if (!adjacencyList.containsKey(start) && adjacencyList.containsKey(end)) {
+            return new String("Zle argumenty");
+        }
+        // znajdz w tablicy
+        String tempString = new String();
+        for (Map.Entry<Integer, TreeMap<Integer, String>> entry : shortestPathToPrint) {
+            if (entry.getKey() == start && entry.getValue().containsKey(end)) {
+                toReturn += start + " -> " + end + " Path: " + entry.getValue().get(end);
+            }
+        }
+        return toReturn;
+    }
 }
+
 
 
 
